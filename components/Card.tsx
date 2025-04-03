@@ -10,6 +10,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/MainStack';
 
+type PosterType = 'portrait' | 'landscape' | 'thumbnail';
+
 type Movie = {
   id: string;
   title: string;
@@ -17,28 +19,44 @@ type Movie = {
   duration: string;
   rating: string;
   posters: {
-    portrait: {
-      url: string;
-    };
+    portrait: { url: string };
+    landscape: { url: string };
+    thumbnail: { url: string };
   };
 };
 
-export default function Card({ movie }: { movie: Movie }) {
+type Props = {
+  movie: Movie;
+  posterType?: PosterType;
+};
+
+export default function Card({ movie, posterType = 'portrait' }: Props) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const imageUrl = movie.posters[posterType]?.url || movie.posters.portrait.url;
 
   const handlePress = () => {
     navigation.navigate('Detail', { movieId: movie.id });
   };
 
+  const getImageHeight = (type: PosterType) => {
+    switch (type) {
+      case 'landscape':
+        return 90;
+      case 'thumbnail':
+        return 160;
+      case 'portrait':
+      default:
+        return 190;
+    }
+  };
+
   return (
     <TouchableOpacity onPress={handlePress} style={styles.card}>
       <Image
-        source={{ uri: movie.posters.portrait.url }}
-        style={styles.image}
+        source={{ uri: imageUrl }}
+        style={[styles.image, { height: getImageHeight(posterType) }]}
       />
-      <Text style={styles.title} numberOfLines={1}>
-        {movie.title}
-      </Text>
+      <Text style={styles.title} numberOfLines={1}>{movie.title}</Text>
       <Text style={styles.meta}>
         {movie.year} · {movie.duration}
       </Text>
@@ -54,7 +72,6 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 190,
     borderRadius: 8,
     backgroundColor: '#222',
   },

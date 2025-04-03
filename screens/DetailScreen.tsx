@@ -1,7 +1,13 @@
-// src/screens/DetailScreen.tsx
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../navigation/MainStack';
 import data from '../moviesJson.json';
 
@@ -9,9 +15,9 @@ type DetailRouteProp = RouteProp<RootStackParamList, 'Detail'>;
 
 export default function DetailScreen() {
   const route = useRoute<DetailRouteProp>();
+  const navigation = useNavigation();
   const { movieId } = route.params;
 
-  // Buscamos la película en el JSON
   const movie =
     data.containers
       .flatMap(container => container.items)
@@ -27,10 +33,15 @@ export default function DetailScreen() {
 
   return (
     <ScrollView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Regresar</Text>
+      </TouchableOpacity>
+
       <Image
-        source={{ uri: movie.posters.landscape.url }}
+        source={{ uri: movie.posters.portrait.url }}
         style={styles.image}
       />
+
       <View style={styles.content}>
         <Text style={styles.title}>{movie.title}</Text>
         <Text style={styles.meta}>
@@ -46,9 +57,17 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#000',
   },
+  backButton: {
+    padding: 12,
+    backgroundColor: '#111',
+  },
+  backText: {
+    color: '#00bcd4',
+    fontSize: 16,
+  },
   image: {
     width: '100%',
-    height: 200,
+    height: 500,
   },
   content: {
     padding: 16,

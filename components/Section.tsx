@@ -3,8 +3,10 @@ import { FlatList, StyleSheet, Text, View } from 'react-native';
 import data from '../moviesJson.json';
 import Card from './Card';
 
+type PosterType = 'portrait' | 'landscape' | 'thumbnail';
+
 type SectionProps = {
-  id: string; // el id de la sección que querés mostrar
+  id: string;
 };
 
 export default function Section({ id }: SectionProps) {
@@ -18,6 +20,14 @@ export default function Section({ id }: SectionProps) {
     );
   }
 
+  const posterTypeMap: Record<string, PosterType> = {
+    'trending': 'portrait',
+    'you-might-like': 'thumbnail',
+    'my-list': 'landscape',
+  };
+
+  const posterType = posterTypeMap[id] || 'portrait';
+
   return (
     <View style={styles.container}>
       <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -27,7 +37,7 @@ export default function Section({ id }: SectionProps) {
         horizontal
         showsHorizontalScrollIndicator={false}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Card movie={item} />}
+        renderItem={({ item }) => <Card movie={item} posterType={posterType} />}
       />
     </View>
   );
